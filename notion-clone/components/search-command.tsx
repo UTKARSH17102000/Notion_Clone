@@ -66,47 +66,21 @@ export const SearchCommand = () => {
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Documents">
-          {documents?.map(
-            (document: {
-              _id: any;
-              title:
-                | string
-                | number
-                | bigint
-                | boolean
-                | ReactElement<any, string | JSXElementConstructor<any>>
-                | Iterable<ReactNode>
-                | ReactPortal
-                | Promise<AwaitedReactNode>
-                | null
-                | undefined;
-              icon:
-                | string
-                | number
-                | bigint
-                | boolean
-                | ReactElement<any, string | JSXElementConstructor<any>>
-                | Iterable<ReactNode>
-                | ReactPortal
-                | Promise<AwaitedReactNode>
-                | null
-                | undefined;
-            }) => (
-              <CommandItem
-                key={document._id}
-                value={`${document._id}-${document.title}`}
-                title={document.title}
-                onSelect={onSelect}
-              >
-                {document.icon ? (
-                  <p className="mr-2 text-[1.125rem]">{document.icon}</p>
-                ) : (
-                  <File className="mr-2 h-4 w-4" />
-                )}
-                <span>{document.title}</span>
-              </CommandItem>
-            )
-          )}
+          {documents?.map((document: any) => (
+            <CommandItem
+              key={document._id}
+              value={`${document._id}-${document.title}`}
+              title={document.title}
+              onSelect={onSelect}
+            >
+              {document.icon ? (
+                <p className="mr-2 text-[1.125rem]">{document.icon}</p>
+              ) : (
+                <File className="mr-2 h-4 w-4" />
+              )}
+              <span>{document.title}</span>
+            </CommandItem>
+          ))}
         </CommandGroup>
       </CommandList>
     </CommandDialog>
