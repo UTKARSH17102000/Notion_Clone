@@ -1,1 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="2048" viewBox="0 0 2048 2048"><path d="M1469.945 349.686v571.836c0 246.756-199.189 445.945-445.945 445.945s-445.945-199.189-445.945-445.945h297.297c0 81.757 66.892 148.648 148.648 148.648s148.648-66.891 148.648-148.648V349.686h297.297Z"/><path stroke="#000" stroke-linecap="square" stroke-width="81.73" d="m562.052 1393.011-115.486 115.486c318.743 318.744 836.125 318.744 1154.868 0l-115.486-115.487c-255.226 255.227-668.67 255.227-923.896.001Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Strata">
+  <!-- Three stacked layers, narrowing upward. The top layer carries the volt
+       accent; the two beneath it are ink. Pages nested inside pages. -->
+  <rect x="64"  y="316" width="384" height="76" rx="16" fill="#121621"/>
+  <rect x="112" y="212" width="288" height="76" rx="16" fill="#121621" opacity="0.62"/>
+  <rect x="160" y="108" width="192" height="76" rx="16" fill="#9DC318"/>
+</svg>

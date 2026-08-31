@@ -4,13 +4,6 @@ import React, { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { useMutation } from "convex/react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-
-import { cn } from "@/lib/utils";
-import { api } from "@/convex/_generated/api";
-import { DocumentList } from "./document-list";
-import { Item } from "./Item";
-import { UserItem } from "./user-item";
-
 import { toast } from "sonner";
 import {
   ChevronsLeft,
@@ -21,14 +14,21 @@ import {
   Settings,
   Trash,
 } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { api } from "@/convex/_generated/api";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { TrashBox } from "./trash-box";
 import { useSearch } from "@/hooks/use-search";
 import { useSettings } from "@/hooks/use-settings";
+
+import { DocumentList } from "./document-list";
+import { Item } from "./Item";
+import { UserItem } from "./user-item";
+import { TrashBox } from "./trash-box";
 import { Navbar } from "./Navbar";
 
 const Navigation = () => {
@@ -52,12 +52,14 @@ const Navigation = () => {
     } else {
       resetWidth();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
   useEffect(() => {
     if (isMobile) {
       collapse();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, isMobile]);
 
   const handleMouseDown = (
@@ -81,10 +83,7 @@ const Navigation = () => {
     if (sidebarRef.current && navbarRef.current) {
       sidebarRef.current.style.width = `${newWidth}px`;
       navbarRef.current.style.setProperty("left", `${newWidth}px`);
-      navbarRef.current.style.setProperty(
-        "width",
-        `calc(100% - ${newWidth}px)`
-      );
+      navbarRef.current.style.setProperty("width", `calc(100% - ${newWidth}px)`);
     }
   };
 
@@ -103,7 +102,7 @@ const Navigation = () => {
       navbarRef.current.style.removeProperty("width");
       navbarRef.current.style.setProperty(
         "width",
-        isMobile ? "0" : "calc(100%-240px)"
+        isMobile ? "0" : "calc(100% - 240px)"
       );
       navbarRef.current.style.setProperty("left", isMobile ? "100%" : "240px");
       setTimeout(() => setIsResetting(false), 300);
@@ -138,49 +137,75 @@ const Navigation = () => {
     <>
       <aside
         ref={sidebarRef}
+        aria-label="Workspace navigation"
         className={cn(
-          "group/sidebar relative z-[300] flex h-full w-60 flex-col overflow-y-auto bg-secondary",
+          "group/sidebar relative z-[300] flex h-full w-60 flex-col overflow-y-auto border-r bg-secondary",
           isResetting && "transition-all duration-300 ease-in-out",
           isMobile && "w-0"
         )}
       >
-        <div
+        <button
+          type="button"
           onClick={collapse}
-          role="button"
+          aria-label="Collapse sidebar"
           className={cn(
-            "absolute right-2 top-3 h-6 w-6 rounded-sm text-muted-foreground opacity-0 transition hover:bg-neutral-300 group-hover/sidebar:opacity-100 dark:hover:bg-neutral-600",
+            "absolute right-2 top-3 rounded-sm p-0.5 text-muted-foreground opacity-0 transition hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover/sidebar:opacity-100",
             isMobile && "opacity-100"
           )}
         >
-          <ChevronsLeft className="h-6 w-6" />
-        </div>
-        <div>
-          <UserItem />
+          <ChevronsLeft className="h-5 w-5" />
+        </button>
+
+        <UserItem />
+
+        <nav aria-label="Workspace actions" className="mt-1">
           <Item label="Search" icon={Search} isSearch onClick={search.onOpen} />
           <Item label="Settings" icon={Settings} onClick={settings.onOpen} />
           <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
+        </nav>
+
+        <div className="mt-6 flex min-h-0 flex-1 flex-col">
+          <h2 className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">
+            Pages
+          </h2>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <DocumentList />
+            <Item onClick={handleCreate} icon={Plus} label="Add a page" />
+          </div>
+
+          <div className="mt-2 border-t pt-1">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="group flex min-h-[27px] w-full items-center gap-x-2 py-1 pl-3 pr-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Trash className="h-[18px] w-[18px] shrink-0" />
+                  <span className="truncate">Trash</span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                collisionPadding={12}
+                className="w-80 p-0"
+              >
+                <TrashBox />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
-        <div className="mt-4">
-          <DocumentList />
-          <Item onClick={handleCreate} icon={Plus} label="Add a page" />
-          <Popover>
-            <PopoverTrigger className="mt-4 w-full">
-              <Item label="Trash" icon={Trash} />
-            </PopoverTrigger>
-            <PopoverContent
-              side={isMobile ? "bottom" : "right"}
-              className="w-72 p-0"
-            >
-              <TrashBox />
-            </PopoverContent>
-          </Popover>
-        </div>
+
         <div
           onMouseDown={handleMouseDown}
           onClick={resetWidth}
-          className="absolute right-0 top-0 h-full w-1 cursor-ew-resize bg-primary/10 opacity-0 transition group-hover/sidebar:opacity-100"
-        ></div>
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize sidebar"
+          className="absolute right-0 top-0 h-full w-1 cursor-ew-resize bg-primary/20 opacity-0 transition group-hover/sidebar:opacity-100"
+        />
       </aside>
+
       <div
         ref={navbarRef}
         className={cn(
@@ -199,11 +224,14 @@ const Navigation = () => {
             )}
           >
             {isCollapsed && (
-              <MenuIcon
+              <button
+                type="button"
                 onClick={resetWidth}
-                role="button"
-                className="h-6 w-6 text-muted-foreground"
-              />
+                aria-label="Open sidebar"
+                className="rounded-sm p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <MenuIcon className="h-6 w-6" />
+              </button>
             )}
           </nav>
         )}
@@ -211,4 +239,5 @@ const Navigation = () => {
     </>
   );
 };
+
 export default Navigation;

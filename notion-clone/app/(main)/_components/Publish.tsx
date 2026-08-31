@@ -37,7 +37,7 @@ export function Publish ({initialData}:PublishProps) {
     toast.promise(promise,{
       loading:"Publishing...",
       success:"Note published",
-      error:"Error to publish note."
+      error:"Failed to publish note."
     })
   }
 
@@ -53,7 +53,7 @@ export function Publish ({initialData}:PublishProps) {
     toast.promise(promise,{
       loading:"Unpublishing...",
       success:"Note unpublished",
-      error:"Error to unpublish note."
+      error:"Failed to unpublish note."
     })
   }
 
@@ -72,21 +72,21 @@ return (
       <PopoverTrigger asChild>
         <Button size='sm' variant='ghost'>
           Publish
-          {initialData.isPublished && <Globe className="text-sky-500 w-4 h-4 ml-2"/>}
+          {initialData.isPublished && <Globe className="text-primary w-4 h-4 ml-2"/>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72" align="end" alignOffset={8} forceMount>
         {initialData.isPublished ? (
           <div className="space-y-4">
             <div className="flex gap-x-2 items-center">
-              <Globe className="text-sky-500 animate-pulse w-4 h-4"/>
-              <p className="text-xs font-medium text-sky-500">
-                This note live on web
+              <Globe className="text-primary w-4 h-4"/>
+              <p className="text-xs font-medium text-primary">
+                This note is live on the web
               </p>
             </div>
             <div className="flex items-center">
               <input className="flex-1 px-2 text-xs border rounded-l-md h-8 bg-muted truncate"
-               value={url} disabled/>
+               value={url} readOnly aria-label="Public link to this note"/>
                <Button className="h-8 rounded-l-none" onClick={onCopy} disabled={copied}>
                 {copied ? (
                   <Check className="w-4 h-4"/>

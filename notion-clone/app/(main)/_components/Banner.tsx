@@ -1,60 +1,75 @@
-'use client'
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useMutation } from "convex/react"
-import { toast } from 'sonner'
+import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 
-import { Id } from "@/convex/_generated/dataModel"
-import { api } from "@/convex/_generated/api"
-import { Button } from "@/components/ui/button"
-import { ConfirmModal } from "@/components/modals/confirm-modal"
+import { Id } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/modals/confirm-modal";
 
 interface BannerProps {
-  documentId:Id<'documents'>
+  documentId: Id<"documents">;
 }
 
-export function Banner ({documentId}:BannerProps) {
+export function Banner({ documentId }: BannerProps) {
+  const router = useRouter();
 
-  const router = useRouter()
-
-  const remove = useMutation(api.documents.remove)
-  const restore = useMutation(api.documents.restore)
+  const remove = useMutation(api.documents.remove);
+  const restore = useMutation(api.documents.restore);
 
   const onRemove = () => {
-    const promise = remove({id:documentId})
+    toast.promise(remove({ id: documentId }), {
+      loading: "Deleting note...",
+      success: "Note deleted!",
+      error: "Failed to delete note.",
+    });
 
-    toast.promise(promise,{
-      loading:'Deleting note...',
-      success:'Note deleted!',
-      error:'Failed to delete note.'
-    })
-
-    router.push('/documents')
-  }
+    router.push("/documents");
+  };
 
   const onRestore = () => {
-    const promise = restore({id:documentId})
+    toast.promise(restore({ id: documentId }), {
+      loading: "Restoring note...",
+      success: "Note restored!",
+      error: "Failed to restore note.",
+    });
+  };
 
-    toast.promise(promise,{
-      loading:'Restoring note...',
-      success:'Note restored!',
-      error:'Failed to restore note.'
-    })
-  }
+  return (
+    <div
+      role="status"
+      className="flex w-full items-center justify-center gap-x-3 border-b border-destructive/30 bg-destructive/10 p-2 text-center text-sm text-destructive"
+    >
+      <Trash2 className="h-4 w-4 shrink-0" aria-hidden />
+      <p className="font-medium">This page is in the Trash.</p>
 
-return (
-    <div className="w-full bg-rose-500 text-center text-sm p-2 text-white flex gap-x-2 justify-center items-center">
-      <p>This page is in the Trash.</p>
-      <Button className="border-white bg-transparent hover:bg-primary/5 text-white hover:text-white p-1 px-2
-      h-auto font-normal" variant='outline' size='sm' onClick={onRestore}>
+      {/* Safe action reads as the default; the irreversible one is destructive. */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onRestore}
+        className="h-auto border-destructive/40 bg-background p-1 px-2 font-normal text-foreground hover:bg-accent"
+      >
         Restore page
       </Button>
-       <ConfirmModal onConfirm={onRemove}>
-        <Button className="border-white bg-transparent hover:bg-primary/5 text-white hover:text-white p-1 px-2
-      h-auto font-normal" variant='outline' size='sm'>
-        Delete forever
-      </Button>
-       </ConfirmModal>
+
+      <ConfirmModal
+        title="Delete this page forever?"
+        description="This page and everything nested inside it will be permanently removed. This cannot be undone."
+        confirmLabel="Delete forever"
+        onConfirm={onRemove}
+      >
+        <Button
+          variant="destructive"
+          size="sm"
+          className="h-auto p-1 px-2 font-normal"
+        >
+          Delete forever
+        </Button>
+      </ConfirmModal>
     </div>
-)
+  );
 }

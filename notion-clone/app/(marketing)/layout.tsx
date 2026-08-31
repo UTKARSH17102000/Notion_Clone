@@ -6,9 +6,11 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-full dark:bg-[#1F1F1F]">
+    <div className="min-h-[100dvh] bg-background">
       <Navbar />
-      <main className="h-full pt-40">{children}</main>
+      {/* Offsets the fixed 64px navbar. The old value was pt-40, which pushed
+          the hero halfway down the viewport. */}
+      <div className="pt-16">{children}</div>
     </div>
   );
 }
