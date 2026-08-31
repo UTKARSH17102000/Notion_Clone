@@ -1,53 +1,57 @@
 "use client";
 
+import Link from "next/link";
 import { useConvexAuth } from "convex/react";
+import { SignInButton, UserButton } from "@clerk/clerk-react";
 
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
 import { ModeToggle } from "@/components/mode-toggle";
-import { SignInButton, UserButton } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useScrollTop } from "@/hooks/use-scroll-top";
-import { Spinner } from "@/components/spinner";
 
 export function Navbar() {
   const { isAuthenticated, isLoading } = useConvexAuth();
-  console.log(isAuthenticated);
   const scrolled = useScrollTop();
 
   return (
-    <div
+    <header
       className={cn(
-        `z-50 bg-background dark:bg-[#1F1F1F] fixed top-0 flex items-center w-full p-6`,
+        "fixed top-0 z-50 w-full bg-shell/85 backdrop-blur-sm transition-shadow",
         scrolled && "border-b shadow-sm"
       )}
     >
-      <Logo />
-      <div className="md:ml-auto md:justify-end flex gap-x-2 justify-between items-center w-full">
-        {isLoading && <Spinner />}
-        {!isAuthenticated && !isLoading && (
-          <>
-            <SignInButton mode="modal">
-              <Button variant="ghost" size="sm">
-                Login
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-x-4 px-6">
+        <Link href="/" aria-label="Strata home">
+          <Logo />
+        </Link>
+
+        <div className="ml-auto flex items-center gap-x-2">
+          {(isLoading || !isAuthenticated) && (
+            <>
+              <SignInButton mode="modal">
+                <Button variant="ghost" size="sm">
+                  Login
+                </Button>
+              </SignInButton>
+              <SignInButton mode="modal">
+                <Button size="sm">Get Strata free</Button>
+              </SignInButton>
+            </>
+          )}
+
+          {isAuthenticated && !isLoading && (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/documents">Enter Strata</Link>
               </Button>
-            </SignInButton>
-            <SignInButton mode="modal">
-              <Button size="sm">Get Joshion free</Button>
-            </SignInButton>
-          </>
-        )}
-        {isAuthenticated && !isLoading && (
-          <>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/documents">Enter Jotion</Link>
-            </Button>
-            <UserButton afterSignOutUrl="/" />
-          </>
-        )}
-        <ModeToggle />
+              <UserButton afterSignOutUrl="/" />
+            </>
+          )}
+
+          <ModeToggle />
+        </div>
       </div>
-    </div>
+    </header>
   );
 }

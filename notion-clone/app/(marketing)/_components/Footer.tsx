@@ -1,21 +1,30 @@
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
 import { Logo } from "./Logo";
 
 export function Footer() {
   return (
-    <div className="flex items-center w-full p-6 bg-background z-50 dark:bg-[#1F1F1F]">
-      <Logo />
-      <div
-        className="md:ml-auto w-full justify-between md:justify-end flex items-center gap-x-2
-        text-muted-foreground"
-      >
-        <Button variant="ghost" size="sm">
-          Privacy Policy
-        </Button>
-        <Button variant="ghost" size="sm">
-          Terms & Conditions
-        </Button>
+    <footer className="border-t bg-shell">
+      <div className="mx-auto flex max-w-6xl flex-col gap-y-4 px-6 py-8 sm:flex-row sm:items-center">
+        <Logo />
+        <nav
+          aria-label="Legal"
+          className="flex items-center gap-x-6 text-sm text-muted-foreground sm:ml-auto"
+        >
+          <Link
+            href="/privacy"
+            className="rounded-sm transition-colors hover:text-foreground"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            href="/terms"
+            className="rounded-sm transition-colors hover:text-foreground"
+          >
+            Terms &amp; Conditions
+          </Link>
+        </nav>
       </div>
-    </div>
+    </footer>
   );
 }

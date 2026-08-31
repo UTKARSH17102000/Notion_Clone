@@ -52,86 +52,98 @@ export function Toolbar({ initialData, preview }: ToolbarProps) {
       event.preventDefault();
       disableInput();
     }
+    if (event.key === "Escape") {
+      disableInput();
+    }
   };
 
   const onIconSelect = (icon: string) => {
-    update({
-      id: initialData._id,
-      icon,
-    });
+    update({ id: initialData._id, icon });
   };
 
   const onRemoveIcon = () => {
-    removeIcon({
-      id: initialData._id,
-    });
+    removeIcon({ id: initialData._id });
   };
 
   return (
-    <div className="pl-[54px] group relative">
+    <div className="group relative px-[54px]">
       {!!initialData.icon && !preview && (
-        <div className="flex gap-x-2 items-center group/icon pt-6">
+        <div className="group/icon flex items-center gap-x-2 pt-6">
           <IconPicker onChange={onIconSelect}>
-            <p className="text-6xl hover:opacity-75 transition">
+            <button
+              type="button"
+              aria-label="Change page icon"
+              className="rounded-md text-6xl leading-none transition hover:opacity-75"
+            >
               {initialData.icon}
-            </p>
+            </button>
           </IconPicker>
           <Button
-            className="rounded-full opacity-0 group-hover/icon:opacity-100 transition
-          text-muted-foreground text-xs"
+            className="rounded-md text-xs text-muted-foreground opacity-0 transition group-hover/icon:opacity-100 focus-visible:opacity-100"
             variant="outline"
             size="icon"
             onClick={onRemoveIcon}
+            aria-label="Remove page icon"
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       )}
+
       {!!initialData.icon && preview && (
-        <p className="text-6xl pt-6">{initialData.icon}</p>
+        <p className="pt-6 text-6xl leading-none">{initialData.icon}</p>
       )}
-      <div className="opacity-0 group-hover:opacity-100 flex items-center gap-x-1 py-4">
+
+      {/* Hover-revealed, but always reachable by keyboard. */}
+      <div className="flex items-center gap-x-1 py-4 opacity-0 transition focus-within:opacity-100 group-hover:opacity-100">
         {!initialData.icon && !preview && (
           <IconPicker asChild onChange={onIconSelect}>
             <Button
-              className="text-muted-foreground text-xs"
+              className="text-xs text-muted-foreground"
               variant="outline"
               size="sm"
             >
-              <Smile className="w-4 h-4 mr-2" />
+              <Smile className="mr-2 h-4 w-4" />
               Add icon
             </Button>
           </IconPicker>
         )}
         {!initialData.coverImage && !preview && (
           <Button
-            className="text-muted-foreground text-xs"
+            className="text-xs text-muted-foreground"
             variant="outline"
             size="sm"
             onClick={coverImage.onOpen}
           >
-            <ImageIcon className="w-4 h-4 mr-2" />
+            <ImageIcon className="mr-2 h-4 w-4" />
             Add cover
           </Button>
         )}
       </div>
+
       {isEditing && !preview ? (
         <TextAreaAutoSize
-          className="text-5xl bg-transparent font-bold break-words outline-none text-[#3F3F3F] dark:text-[#CFCFCF]
-        resize-none"
+          className="w-full resize-none break-words bg-transparent font-serif text-[2.75rem] font-semibold leading-tight text-foreground outline-none"
           ref={inputRef}
           onBlur={disableInput}
           onKeyDown={onKeyDown}
           value={value}
           onChange={(e) => onInput(e.target.value)}
+          aria-label="Page title"
         />
+      ) : preview ? (
+        <h1 className="break-words pb-[11.5px] font-serif text-[2.75rem] font-semibold leading-tight text-foreground">
+          {initialData.title}
+        </h1>
       ) : (
-        <div
-          className="pb-[11.5px] text-5xl font-bold break-words outline-none text-[#3F3F3F] dark:text-[#CFCFCF]"
+        <button
+          type="button"
           onClick={enableInput}
+          className="w-full break-words rounded-sm pb-[11.5px] text-left font-serif text-[2.75rem] font-semibold leading-tight text-foreground"
+          aria-label={"Rename page. Current title: " + initialData.title}
         >
           {initialData.title}
-        </div>
+        </button>
       )}
     </div>
   );

@@ -19,20 +19,21 @@ export function UserItem() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div
-          className="flex items-center text-sm p-3 w-full hover:bg-primary/5"
-          role="button"
+        <button
+          type="button"
+          aria-label="Workspace menu"
+          className="flex w-full items-center p-3 text-sm hover:bg-accent"
         >
           <div className="gap-x-2 flex items-center max-w-[150px]">
             <Avatar className="w-5 h-5">
               <AvatarImage src={user?.imageUrl} />
             </Avatar>
             <span className="text-start font-medium line-clamp-1">
-              {user?.fullName}&apos;s Jotion
+              {user?.fullName}&apos;s Strata
             </span>
           </div>
-          <ChevronsLeftRight className="rotate-90 ml-2 text-muted-foreground w-4 h-4" />
-        </div>
+          <ChevronsLeftRight className="ml-2 h-4 w-4 rotate-90 text-muted-foreground" />
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-80"
@@ -52,7 +53,7 @@ export function UserItem() {
             </div>
             <div className="space-y-1">
               <p className="text-sm line-clamp-1">
-                {user?.fullName}&apos;s Jotion
+                {user?.fullName}&apos;s Strata
               </p>
             </div>
           </div>

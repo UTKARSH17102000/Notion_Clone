@@ -1,17 +1,29 @@
 import { Footer } from "./_components/Footer";
 import { Heading } from "./_components/heading";
-import { Heroes } from "./_components/heroes";
+import { Grain, ScrollProgress } from "./_components/motion-primitives";
+import {
+  CapabilitiesSection,
+  CtaSection,
+  EditorSection,
+  KeyboardSection,
+  PublishSection,
+  StackSection,
+} from "./_components/sections";
 
 const MarketingPage = () => {
   return (
-    <div className="min-h-full flex flex-col dark:bg-[#1F1F1F]">
-      <div
-        className="flex flex-col items-center justify-center
-      md:justify-start text-center gap-y-8 flex-1 px-6 pb-10"
-      >
+    <div className="flex min-h-[100dvh] flex-col">
+      <ScrollProgress />
+      <Grain />
+      <main className="flex-1">
         <Heading />
-        <Heroes />
-      </div>
+        <EditorSection />
+        <CapabilitiesSection />
+        <PublishSection />
+        <KeyboardSection />
+        <StackSection />
+        <CtaSection />
+      </main>
       <Footer />
     </div>
   );

@@ -8,67 +8,101 @@ body,
   height: 100%;
 }
 
+/* ---------------------------------------------------------------------------
+   Strata design tokens: Volt.
+
+   One accent hue (volt lime) against a cool blue-black ink ramp. Warm accent
+   logic inverted from the previous system: the base is cold, the accent is
+   electric, and the contrast between them is the identity.
+
+   THE VIVID RULE. `--vivid` is the bright lime. It measures 1.19:1 against a
+   light background, so it is NEVER a bare marker, border or text colour on a
+   light surface. It is only ever:
+     1. a FILL with --vivid-foreground text on top   (12.43:1, passes anywhere)
+     2. a marker on a dark surface                   (15.62:1)
+     3. a decorative glow that carries no meaning
+   For markers and accent text, use `--primary`, which is tuned per mode
+   (deep moss in light at 6.48:1, bright lime in dark at 15.43:1).
+
+   Radius rule: 4px rows/inputs/buttons/cards, 10px overlay surfaces.
+--------------------------------------------------------------------------- */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --background: 220 28% 98%;
+    --foreground: 226 28% 10%;
+
+    --shell: 220 24% 96%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 226 28% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
+    --popover: 220 30% 99%;
+    --popover-foreground: 226 28% 10%;
 
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    /* AA-safe accent for text, icons and markers. */
+    --primary: 82 78% 22%;
+    --primary-foreground: 80 60% 97%;
 
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
+    /* The volt. Fills and glow only. See THE VIVID RULE. */
+    --vivid: 74 92% 58%;
+    --vivid-foreground: 80 70% 9%;
 
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 226 24% 16%;
 
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --muted: 220 18% 93%;
+    --muted-foreground: 222 12% 38%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --accent: 220 18% 91%;
+    --accent-foreground: 226 26% 12%;
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --destructive: 358 68% 44%;
+    --destructive-foreground: 0 0% 99%;
 
-    --radius: 0.5rem;
+    --border: 220 16% 87%;
+    --input: 220 16% 82%;
+    --ring: 82 74% 30%;
+
+    --radius: 0.25rem;
+    --radius-overlay: 0.625rem;
+
+    --doc-column: 42rem;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 225 22% 5%;
+    --foreground: 220 20% 96%;
 
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --shell: 226 20% 7%;
 
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --card: 226 18% 9%;
+    --card-foreground: 220 20% 96%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --popover: 226 18% 10%;
+    --popover-foreground: 220 20% 96%;
 
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
+    --primary: 74 88% 62%;
+    --primary-foreground: 80 70% 9%;
 
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --vivid: 74 92% 58%;
+    --vivid-foreground: 80 70% 9%;
 
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --secondary: 226 17% 9%;
+    --secondary-foreground: 220 18% 92%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --muted: 226 14% 15%;
+    --muted-foreground: 220 12% 68%;
 
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --accent: 226 15% 15%;
+    --accent-foreground: 220 20% 96%;
+
+    --destructive: 358 84% 68%;
+    --destructive-foreground: 358 60% 9%;
+
+    --border: 226 14% 18%;
+    --input: 226 14% 22%;
+    --ring: 74 88% 55%;
   }
 }
 
@@ -76,7 +110,271 @@ body,
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* A visible ring everywhere except the writing surface, which uses the
+     caret instead. */
+  :focus-visible:not([contenteditable="true"]) {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    background-color: hsl(var(--vivid) / 0.28);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion primitives.
+
+   Everything animates transform or opacity only. Anything that loops or
+   scrubs collapses under the reduced-motion block at the end of this file.
+--------------------------------------------------------------------------- */
+
+@layer utilities {
+  /* Slow drifting light behind the hero. Two counter-rotating fields so the
+     shape never repeats on a visible cycle. */
+  .aurora-field {
+    animation: aurora-drift 26s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  .aurora-field-slow {
+    animation: aurora-drift-2 38s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  /* Text that reveals from behind its own baseline. */
+  .clip-reveal {
+    clip-path: inset(0 0 110% 0);
+  }
+
+  /* Hairline grid that the aurora shows through. */
+  .grid-field {
+    background-image: linear-gradient(
+        to right,
+        hsl(var(--foreground) / 0.055) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--foreground) / 0.055) 1px,
+        transparent 1px
+      );
+    background-size: 68px 68px;
+  }
+
+  .volt-glow {
+    box-shadow: 0 0 0 1px hsl(var(--vivid) / 0.5),
+      0 8px 34px -8px hsl(var(--vivid) / 0.45);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-8%, -4%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(10%, 6%, 0) scale(1.25);
+  }
+}
+
+@keyframes aurora-drift-2 {
+  from {
+    transform: translate3d(6%, 8%, 0) scale(1.15);
+  }
+  to {
+    transform: translate3d(-9%, -6%, 0) scale(0.95);
+  }
+}
+
+@keyframes marquee-track {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-track {
+  animation: marquee-track 34s linear infinite;
+  will-change: transform;
+}
+
+/* Fixed grain. Never on a scrolling container, per the perf rule. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------------------------
+   BlockNote canvas.
+
+   The editor stays deliberately quiet. It gets the tokens and the serif, and
+   none of the motion.
+--------------------------------------------------------------------------- */
+
+.bn-root.bn-container.bn-ariakit {
+  --bn-colors-editor-text: hsl(var(--foreground));
+  --bn-colors-editor-background: transparent;
+
+  --bn-colors-menu-text: hsl(var(--popover-foreground));
+  --bn-colors-menu-background: hsl(var(--popover));
+
+  --bn-colors-tooltip-text: hsl(var(--popover-foreground));
+  --bn-colors-tooltip-background: hsl(var(--muted));
+
+  --bn-colors-hovered-text: hsl(var(--accent-foreground));
+  --bn-colors-hovered-background: hsl(var(--accent));
+
+  --bn-colors-selected-text: hsl(var(--vivid-foreground));
+  --bn-colors-selected-background: hsl(var(--vivid));
+
+  --bn-colors-disabled-text: hsl(var(--muted-foreground));
+  --bn-colors-disabled-background: hsl(var(--muted));
+
+  --bn-colors-side-menu: hsl(var(--muted-foreground));
+  --bn-colors-border: hsl(var(--border));
+  --bn-colors-shadow: hsl(225 40% 2% / 0.45);
+
+  --bn-border-radius-small: var(--radius);
+  --bn-border-radius-medium: var(--radius-overlay);
+  --bn-border-radius-large: var(--radius-overlay);
+
+  --bn-font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+}
+
+.bn-root.bn-container .bn-default-styles {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+.bn-root.bn-container [data-content-type="heading"] {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.bn-root.bn-container input[type="checkbox"] {
+  accent-color: hsl(var(--vivid));
+}
+
+.bn-root.bn-container .bn-inline-content code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  background-color: hsl(var(--muted));
+  border-radius: var(--radius);
+  padding: 0.1em 0.35em;
+}
+
+.bn-root.bn-container .bn-inline-content a {
+  color: hsl(var(--primary));
+  text-underline-offset: 2px;
+}
+
+.bn-root.bn-container [data-content-type="quote"] blockquote {
+  color: hsl(var(--muted-foreground));
+  border-left-color: hsl(var(--vivid) / 0.65);
+}
+
+/* ---------------------------------------------------------------------------
+   BlockNote ariakit UI. The variant hardcodes #007acc for its active row and
+   popover outline, so those are overridden by selector rather than variable.
+--------------------------------------------------------------------------- */
+
+.bn-ak-menu.bn-ak-menu,
+.bn-ak-popover.bn-ak-popover {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  border-color: hsl(var(--border));
+  border-radius: var(--radius-overlay);
+}
+
+.bn-ak-menu-item.bn-ak-menu-item,
+.bn-ak-select-item.bn-ak-select-item {
+  border-radius: var(--radius);
+}
+
+.bn-ak-menu-item[data-active-item][data-active-item],
+.bn-ak-select-item[data-active-item][data-active-item],
+.bn-ak-menu-item[aria-selected="true"][aria-selected="true"],
+.bn-ak-menu-item.bn-ak-menu-item:hover,
+.bn-ak-tab[aria-selected="true"][aria-selected="true"] {
+  background-color: hsl(var(--vivid));
+  color: hsl(var(--vivid-foreground));
+}
+
+.bn-ak-menu-item[data-active][data-active],
+.bn-ak-menu-item.bn-ak-menu-item:active {
+  background-color: hsl(var(--vivid) / 0.85);
+}
+
+.bn-ak-popover.bn-ak-popover:focus-visible,
+.bn-ak-popover[data-focus-visible][data-focus-visible] {
+  outline-color: hsl(var(--ring));
+}
+
+.bn-ak-group-label.bn-ak-group-label {
+  color: hsl(var(--muted-foreground));
+  opacity: 1;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bn-editor:focus-visible,
+[contenteditable="true"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion. Everything above collapses to static.
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* :root[data-motion="on"] is the explicit override used for capturing
+     stills. Without it these rules apply as normal. */
+  html:not([data-motion="on"]) *,
+  html:not([data-motion="on"]) *::before,
+  html:not([data-motion="on"]) *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html:not([data-motion="on"]) .aurora-field,
+  html:not([data-motion="on"]) .aurora-field-slow,
+  html:not([data-motion="on"]) .marquee-track {
+    animation: none !important;
+  }
+
+  /* Entrance animations start hidden. Under reduced motion the JS layer may
+     skip them entirely, so the end state is guaranteed here instead. Content
+     must never depend on an animation having run in order to be visible. */
+  [data-entrance] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+  }
+
+  .clip-reveal {
+    clip-path: none !important;
   }
 }
